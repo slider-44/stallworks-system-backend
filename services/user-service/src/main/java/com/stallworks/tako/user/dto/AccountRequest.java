@@ -1,4 +1,4 @@
-package com.stallworks.tako.dto;
+package com.stallworks.tako.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

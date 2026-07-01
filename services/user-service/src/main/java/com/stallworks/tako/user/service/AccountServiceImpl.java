@@ -1,16 +1,16 @@
-package com.stallworks.tako.service;
+package com.stallworks.tako.user.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.stallworks.tako.dto.AccountMapper;
-import com.stallworks.tako.dto.AccountRequest;
-import com.stallworks.tako.dto.AccountResponse;
-import com.stallworks.tako.entity.Account;
-import com.stallworks.tako.entity.Employee;
-import com.stallworks.tako.repository.AccountRepository;
-import com.stallworks.tako.repository.EmployeeRepository;
+import com.stallworks.tako.user.dto.AccountMapper;
+import com.stallworks.tako.user.dto.AccountRequest;
+import com.stallworks.tako.user.dto.AccountResponse;
+import com.stallworks.tako.user.entity.Account;
+import com.stallworks.tako.user.entity.Employee;
+import com.stallworks.tako.user.repository.AccountRepository;
+import com.stallworks.tako.user.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;
 

@@ -1,9 +1,9 @@
-package com.stallworks.tako.service;
+package com.stallworks.tako.user.service;
 
 import java.util.List;
 
-import com.stallworks.tako.dto.EmployeeRequest;
-import com.stallworks.tako.dto.EmployeeResponse;
+import com.stallworks.tako.user.dto.EmployeeRequest;
+import com.stallworks.tako.user.dto.EmployeeResponse;
 
 public interface EmployeeService {
 	

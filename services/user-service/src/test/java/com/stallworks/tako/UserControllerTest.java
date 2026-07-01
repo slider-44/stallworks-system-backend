@@ -16,11 +16,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.stallworks.tako.controller.UserController;
-import com.stallworks.tako.dto.AccountRequest;
-import com.stallworks.tako.dto.AccountResponse;
-import com.stallworks.tako.dto.EmployeeSummary;
-import com.stallworks.tako.service.AccountService;
+import com.stallworks.tako.user.controller.UserController;
+import com.stallworks.tako.user.dto.AccountRequest;
+import com.stallworks.tako.user.dto.AccountResponse;
+import com.stallworks.tako.user.dto.EmployeeSummary;
+import com.stallworks.tako.user.service.AccountService;
 
 import tools.jackson.databind.ObjectMapper;
 

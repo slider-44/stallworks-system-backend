@@ -1,4 +1,4 @@
-package com.stallworks.tako.repository;
+package com.stallworks.tako.user.repository;
 
 import java.util.List;
 
@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import com.stallworks.tako.entity.EmployeeBranch;
+import com.stallworks.tako.user.entity.EmployeeBranch;
 
 @Repository
 public interface EmployeeBranchRepository extends JpaRepository<EmployeeBranch, Long> {

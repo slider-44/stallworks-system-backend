@@ -1,4 +1,4 @@
-package com.stallworks.tako.entity;
+package com.stallworks.tako.user.entity;
 
 import java.time.LocalDateTime;
 
@@ -9,10 +9,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,30 +20,45 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "employee_branches", uniqueConstraints = @UniqueConstraint(name = "uq_employee_branch", columnNames = {
-		"employee_id", "branch_id" }))
+@Table(name = "accounts")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-public class EmployeeBranch {
+public class Account {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "employee_id", nullable = false)
+
+	@Column(nullable = false, unique = true)
+	private String userName;
+
+	@Column(nullable = false)
+	private String password;
+
+	@Column(nullable = false)
+	@Builder.Default
+	private boolean enabled = true;
+
+	@OneToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "employee_id", nullable = false, unique = true)
 	private Employee employee;
-	
-	@Column(name = "branch_id", nullable = false)
-	private Long branchId;
-	
+
 	@Column(nullable = false, updatable = false)
-	private LocalDateTime assignedAt;
+	private LocalDateTime createdAt;
+
+	private LocalDateTime updatedAt;
 
 	@PrePersist
 	protected void onCreate() {
-		this.assignedAt = LocalDateTime.now();
+		this.createdAt = LocalDateTime.now();
+		this.updatedAt = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	protected void onUpdate() {
+		this.updatedAt = LocalDateTime.now();
 	}
 }

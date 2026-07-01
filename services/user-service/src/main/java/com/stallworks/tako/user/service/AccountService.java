@@ -1,11 +1,11 @@
-package com.stallworks.tako.service;
+package com.stallworks.tako.user.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.stallworks.tako.dto.AccountRequest;
-import com.stallworks.tako.dto.AccountResponse;
+import com.stallworks.tako.user.dto.AccountRequest;
+import com.stallworks.tako.user.dto.AccountResponse;
 
 public interface AccountService  {
 	

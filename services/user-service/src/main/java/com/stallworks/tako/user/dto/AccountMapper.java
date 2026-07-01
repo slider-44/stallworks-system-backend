@@ -1,9 +1,9 @@
-package com.stallworks.tako.dto;
+package com.stallworks.tako.user.dto;
 
 import org.springframework.stereotype.Component;
 
-import com.stallworks.tako.entity.Account;
-import com.stallworks.tako.entity.Employee;
+import com.stallworks.tako.user.entity.Account;
+import com.stallworks.tako.user.entity.Employee;
 
 @Component
 public class AccountMapper {

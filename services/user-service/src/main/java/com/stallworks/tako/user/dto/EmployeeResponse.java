@@ -1,4 +1,4 @@
-package com.stallworks.tako.dto;
+package com.stallworks.tako.user.dto;
 
 import java.util.List;
 

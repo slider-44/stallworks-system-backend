@@ -1,4 +1,4 @@
-package com.stallworks.tako.controller;
+package com.stallworks.tako.user.controller;
 
 import java.net.URI;
 
@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.stallworks.tako.dto.AccountRequest;
-import com.stallworks.tako.dto.AccountResponse;
-import com.stallworks.tako.service.AccountService;
+import com.stallworks.tako.user.dto.AccountRequest;
+import com.stallworks.tako.user.dto.AccountResponse;
+import com.stallworks.tako.user.service.AccountService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

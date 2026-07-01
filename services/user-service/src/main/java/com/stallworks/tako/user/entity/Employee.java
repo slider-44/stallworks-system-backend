@@ -1,8 +1,8 @@
-package com.stallworks.tako.entity;
+package com.stallworks.tako.user.entity;
 
 import java.time.LocalDateTime;
 
-import com.stallworks.tako.dto.Role;
+import com.stallworks.tako.user.dto.Role;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

@@ -1,4 +1,4 @@
-package com.stallworks.tako.service;
+package com.stallworks.tako.user.service;
 
 import java.util.List;
 import java.util.Map;
@@ -6,13 +6,13 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import com.stallworks.tako.dto.EmployeeMapper;
-import com.stallworks.tako.dto.EmployeeRequest;
-import com.stallworks.tako.dto.EmployeeResponse;
-import com.stallworks.tako.entity.Employee;
-import com.stallworks.tako.entity.EmployeeBranch;
-import com.stallworks.tako.repository.EmployeeBranchRepository;
-import com.stallworks.tako.repository.EmployeeRepository;
+import com.stallworks.tako.user.dto.EmployeeMapper;
+import com.stallworks.tako.user.dto.EmployeeRequest;
+import com.stallworks.tako.user.dto.EmployeeResponse;
+import com.stallworks.tako.user.entity.Employee;
+import com.stallworks.tako.user.entity.EmployeeBranch;
+import com.stallworks.tako.user.repository.EmployeeBranchRepository;
+import com.stallworks.tako.user.repository.EmployeeRepository;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
