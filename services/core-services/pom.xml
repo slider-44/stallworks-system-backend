@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<!-- Inherit Spring Boot's managed dependency versions -->
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>3.3.5</version>
+		<relativePath />
+	</parent>
+
+	<groupId>com.stallworks</groupId>
+	<artifactId>core-services</artifactId>
+	<version>1.0.0</version>
+	<packaging>pom</packaging>
+	<name>core-services</name>
+	<description>Stallworks core business service (modular monolith: one
+		deployable, one database)</description>
+
+	<properties>
+		<java.version>17</java.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+		</dependency>
+	</dependencies>
+
+	<!-- The reactor. core-app is the only bootable module; the rest are library
+	jars.
+         To ADD a module: create the folder + pom (parent = this), list it here,
+         and (if it exposes endpoints) add it as a dependency in core-app. -->
+	<modules>
+
+		<module>core-sales</module>
+		<module>core-inventory</module>
+		<module>core-app</module>
+		<module>core-common</module>
+	</modules>
+</project>
