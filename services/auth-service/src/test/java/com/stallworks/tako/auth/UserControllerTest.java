@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.stallworks.tako.auth.controller.UserController;
 import com.stallworks.tako.auth.dto.AccountRequest;
 import com.stallworks.tako.auth.dto.AccountResponse;
-import com.stallworks.tako.auth.dto.EmployeeSummary;
 import com.stallworks.tako.auth.service.AccountService;
 
 import tools.jackson.databind.ObjectMapper;
@@ -40,12 +39,7 @@ class UserControllerTest {
 	public void createUser_shouldReturn201WithLocationAndBody() throws Exception {
 
 		
-		EmployeeSummary employee = EmployeeSummary.builder()
-		        .id(1L)
-		        .firstName("Jane")
-		        .lastName("Doe")
-		        .build();
-
+	
 		
 		AccountRequest request = AccountRequest.builder()
 				.employeeId(1L)
@@ -58,7 +52,7 @@ class UserControllerTest {
 				.id(1L)
 				.userName("jdoe")
 				.enabled(true)
-				.employee(employee)
+				.employeeId(1L)
 				.build();
 
 

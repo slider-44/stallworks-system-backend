@@ -1,131 +1,108 @@
 name: stallworks-system
 
 services:
-  user-db:
+  # ---------- databases ----------
+  auth-db:
     image: postgres:16
-    container_name: user-db
-    environment:
-      POSTGRES_DB: user_db
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: user
-    ports:
-      - "5433:5432"
-    volumes:
-      - user_db_data:/var/lib/postgresql/data
-
-  branch-db:
-    image: postgres:16
-    container_name: branch-db
-    environment:
-      POSTGRES_DB: branch_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5434:5432"
-    volumes:
-      - branch_db_data:/var/lib/postgresql/data
-
-  sales-db:
-    image: postgres:16
-    container_name: sales-db
-    environment:
-      POSTGRES_DB: sales_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5435:5432"
-    volumes:
-      - sales_db_data:/var/lib/postgresql/data
-
-  inventory-db:
-    image: postgres:16
-    container_name: inventory-db
-    environment:
-      POSTGRES_DB: inventory_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5436:5432"
-    volumes:
-      - inventory_db_data:/var/lib/postgresql/data
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: pgadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
+      POSTGRES_DB: ${AUTH_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${AUTH_DB_PORT}:5432"
+    volumes:
+      - auth_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${AUTH_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  core-db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${CORE_DB_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${CORE_DB_PORT}:5432"
+    volumes:
+      - core_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${CORE_DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ---------- db admin UI ----------
+  pgadmin:
+    image: dpage/pgadmin4:9.4
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
       - "5050:80"
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - pgadmin_data:/var/lib/pgadmin
     depends_on:
-      - user-db
-      - branch-db
-      - sales-db
-      - inventory-db
+      auth-db:
+        condition: service_healthy
+      core-db:
+        condition: service_healthy
 
+  # ---------- application services ----------
   auth-service:
     build:
-      context: ./auth-service
-    container_name: auth-service
+      context: ./services/auth-service
     profiles: ["apps"]
+    restart: unless-stopped
     depends_on:
-      - auth-db
+      auth-db:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/auth_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/${AUTH_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "8081:8080"
+      - "${AUTH_SERVICE_PORT}:8080"
 
-  branch-service:
+  core-service:
     build:
-      context: ./branch-service
-    container_name: branch-service
+      context: ./services/core-service
     profiles: ["apps"]
+    restart: unless-stopped
     depends_on:
-      - branch-db
+      core-db:
+        condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://branch-db:5432/branch_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://core-db:5432/${CORE_DB_NAME}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "8082:8080"
+      - "${CORE_SERVICE_PORT}:8080"
 
-  inventory-service:
-    build:
-      context: ./inventory-service
-    container_name: inventory-service
-    profiles: ["apps"]
-    depends_on:
-      - inventory-db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://inventory-db:5432/inventory_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    ports:
-      - "8083:8080"
-
-  sales-service:
-    build:
-      context: ./sales-service
-    container_name: sales-service
-    profiles: ["apps"]
-    depends_on:
-      - sales-db
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://sales-db:5432/sales_db
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: postgres
-    ports:
-      - "8084:8080"
+  # ---------- gateway ----------
+  # api-gateway:
+  #   build:
+  #     context: ./gateway/api-gateway
+  #   profiles: ["apps"]
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - auth-service
+  #     - core-service
+  #   environment:
+  #     SERVER_PORT: 8080
+  #     AUTH_URI: http://auth-service:8080
+  #     CORE_URI: http://core-service:8080
+  #   ports:
+  #     - "8090:8080"
 
 volumes:
-  user_db_data:
-  branch_db_data:
-  sales_db_data:
-  inventory_db_data:
-  notification_db_data:
-  pgadmin-data:
+  auth_db_data:
+  core_db_data:
+  pgadmin_data:

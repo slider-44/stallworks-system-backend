@@ -3,7 +3,6 @@ package com.stallworks.tako.auth.dto;
 import org.springframework.stereotype.Component;
 
 import com.stallworks.tako.auth.entity.Account;
-import com.stallworks.tako.auth.entity.Employee;
 
 @Component
 public class AccountMapper {
@@ -14,25 +13,18 @@ public class AccountMapper {
 				.id(account.getId())
                 .userName(account.getUserName())
                 .enabled(account.isEnabled())
-                .employee(toEmployeeSummary(account.getEmployee()))
+                .employeeId(account.getEmployeeId())
                 .build();
 		
 	}
 	
-	private EmployeeSummary toEmployeeSummary(Employee employee) {
-		   return EmployeeSummary.builder()
-	                .id(employee.getId())
-	                .firstName(employee.getFirstName())
-	                .lastName(employee.getLastName())
-	                .role(employee.getRole())
-	                .build();
-	}
+
 	
-	public Account toEntity(AccountRequest request, Employee employee) {
+	public Account toEntity(AccountRequest request) {
 		 return Account.builder()
 	                .userName(request.userName())
 	                .password(request.password())
-	                .employee(employee)
+	                .employeeId(request.employeeId())
 	                .enabled(true)
 	                .build();
 		

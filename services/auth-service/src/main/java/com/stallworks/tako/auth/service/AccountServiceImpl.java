@@ -8,9 +8,7 @@ import com.stallworks.tako.auth.dto.AccountMapper;
 import com.stallworks.tako.auth.dto.AccountRequest;
 import com.stallworks.tako.auth.dto.AccountResponse;
 import com.stallworks.tako.auth.entity.Account;
-import com.stallworks.tako.auth.entity.Employee;
 import com.stallworks.tako.auth.repository.AccountRepository;
-import com.stallworks.tako.auth.repository.EmployeeRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -19,29 +17,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class AccountServiceImpl implements AccountService {
 	
-	private final AccountRepository userRepository;
+	private final AccountRepository accountRepository;
 	
 	private final AccountMapper userMapper;
-	
-	private final EmployeeRepository employeeRepository;
+
 	
 	
 
 	@Override
 	public AccountResponse createUser(AccountRequest request) {
 		
-		if(userRepository.existsByUserName(request.userName())) {
+		if(accountRepository.existsByUserName(request.userName())) {
 			 throw new RuntimeException("Username already exists");
 		}
 		
-		if(userRepository.existsById(request.employeeId())) {
+		if(accountRepository.existsById(request.employeeId())) {
 			 throw new RuntimeException("Employee already has account");
 		}
+
 		
-		Employee employee = employeeRepository.findById(request.employeeId())
-				 .orElseThrow(() -> new RuntimeException("Employee not found"));
-		
-		Account savedAccount = userRepository.save(userMapper.toEntity(request, employee));
+		Account savedAccount = accountRepository.save(userMapper.toEntity(request));
 		
 		
 		return userMapper.toResponse(savedAccount);
@@ -49,16 +44,23 @@ public class AccountServiceImpl implements AccountService {
 		
 	}
 
+
+
+
 	@Override
 	public List<AccountResponse> getUsers() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+
+
+
 	@Override
 	public AccountResponse getUser(Long Id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 
 }

@@ -7,6 +7,6 @@ public record AccountResponse(
 		 Long id,
 	        String userName,
 	        boolean enabled,
-	        EmployeeSummary employee ) {
+	        Long employeeId) {
 
 }
