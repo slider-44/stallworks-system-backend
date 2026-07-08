@@ -1,6 +1,33 @@
+HELP.md
 target/
 build/
-*.class
+
+!**/src/main/**/target/
+!**/src/test/**/target/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### Eclipse / STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache
+
+### IntelliJ ###
+.idea/
+*.iml
+*.ipr
+*.iws
+
+### VS Code ###
+.vscode/
+
+### Environment ###
 .env
 *.log
-.mvn/
+
+### Maven Wrapper ###
+.mvn/wrapper/maven-wrapper.jar
