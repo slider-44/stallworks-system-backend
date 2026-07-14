@@ -2,6 +2,9 @@ package com.stallworks.tako.core.common.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.stallworks.tako.core.common.dto.Role;
 
 import jakarta.persistence.Column;
@@ -50,20 +53,13 @@ public class Employee {
     @Builder.Default
     private boolean active = true;
 
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime createdAt;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-	private LocalDateTime updatedAt;
-
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-		this.updatedAt = LocalDateTime.now();
-	}
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 	
-	@PreUpdate
-	protected void onUpdate() {
-	    this.updatedAt = LocalDateTime.now();
-	}
 
 }

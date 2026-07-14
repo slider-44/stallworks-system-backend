@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "container")
+@Table(name = "containers")
 @Builder
 @Getter
 @Setter
 @NoArgsConstructor      // <-- JPA requires this
 @AllArgsConstructor
-public class Container {
+public class Containers {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

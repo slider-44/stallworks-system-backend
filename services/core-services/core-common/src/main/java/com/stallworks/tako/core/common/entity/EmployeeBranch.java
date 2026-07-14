@@ -2,6 +2,9 @@ package com.stallworks.tako.core.common.entity;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,7 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
@@ -36,14 +38,18 @@ public class EmployeeBranch {
 	@JoinColumn(name = "employee_id", nullable = false)
 	private Employee employee;
 	
-	@Column(name = "branch_id", nullable = false)
-	private Long branchId;
+//	@Column(name = "branch_id", nullable = false)
+//	private Long branchId;
 	
-	@Column(nullable = false, updatable = false)
-	private LocalDateTime assignedAt;
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JoinColumn(name = "branch_id", nullable = false)
+	private Branch branch;
+	
+	@CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
 
-	@PrePersist
-	protected void onCreate() {
-		this.assignedAt = LocalDateTime.now();
-	}
+    @UpdateTimestamp
+    @Column(name = "updated_at", nullable = false)
+    private LocalDateTime updatedAt;
 }

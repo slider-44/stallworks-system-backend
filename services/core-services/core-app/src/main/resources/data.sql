@@ -1,7 +1,7 @@
 
 
 
-INSERT INTO container (container_size, description, pieces, price, active)
+INSERT INTO containers (container_size, description, pieces, price, active)
 VALUES
 ('SOLO', '320CC/450ML', 4, 49.00, true),
 ('DOUBLE', '520CC/750ML', 8, 95.00, true),

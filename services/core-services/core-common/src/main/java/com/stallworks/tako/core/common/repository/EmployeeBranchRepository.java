@@ -13,20 +13,22 @@ public interface EmployeeBranchRepository extends JpaRepository<EmployeeBranch, 
 
 	boolean existsByEmployeeIdAndBranchId(Long employeeId, Long branchId);
 
-	@Query("""
-			SELECT eb
-			FROM EmployeeBranch eb
-			JOIN FETCH eb.employee
-			WHERE eb.branchId = :branchId
-			""")
-	List<EmployeeBranch> findAllByBranchIdWithEmployee(Long branchId);
+	  @Query("""
+	            SELECT eb
+	            FROM EmployeeBranch eb
+	            JOIN FETCH eb.employee
+	            WHERE eb.branch.id = :branchId
+	            """)
+	    List<EmployeeBranch> findAllByBranchIdWithEmployee(Long branchId);
+	  
+	  
 	
-	@Query("""
-	        SELECT eb
-	        FROM EmployeeBranch eb
-	        JOIN FETCH eb.employee
-	        WHERE eb.employee.id IN :employeeIds
-	        """)
-	List<EmployeeBranch> findByEmployeeIdIn(List<Long> employeeIds);
+	  @Query("""
+	            SELECT eb
+	            FROM EmployeeBranch eb
+	            JOIN FETCH eb.employee
+	            WHERE eb.employee.id IN :employeeIds
+	            """)
+	    List<EmployeeBranch> findAllByEmployeeIdsWithEmployee(List<Long> employeeIds);
 
 }

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.stallworks.tako.core.inventory.dto.ContainerMapper;
 import com.stallworks.tako.core.inventory.dto.ContainerResponse;
-import com.stallworks.tako.core.inventory.entity.Container;
+import com.stallworks.tako.core.inventory.entity.Containers;
 import com.stallworks.tako.core.inventory.repository.ContainerRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ public class ContainerServiceImp implements ContainerService {
 	@Override
 	public List<ContainerResponse> getContainers() {
 
-		List<Container> containers = containerRepository.findAll();
+		List<Containers> containers = containerRepository.findAll();
 
 		return containers.stream().map(containerMapper::toResponse).toList();
 
@@ -32,7 +32,7 @@ public class ContainerServiceImp implements ContainerService {
 	public List<ContainerResponse> getContainersByActive(boolean isActive) {
 		// TODO Auto-generated method stub
 		
-		List<Container> containers = containerRepository.findAllByActive(isActive);
+		List<Containers> containers = containerRepository.findAllByActive(isActive);
 		
 		return containers.stream()
 				.map(containerMapper:: toResponse)
