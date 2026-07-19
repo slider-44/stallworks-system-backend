@@ -44,8 +44,10 @@ public class SalesLineItem {
 
 	@Column(nullable = false)
 	private BigDecimal unitPrice; // snapshot at time of sale
+	
 	@Column(nullable = false)
 	private Integer quantitySold;
+	
 	@Column(nullable = false)
 	private BigDecimal lineTotal;
 

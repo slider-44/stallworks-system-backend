@@ -1,7 +1,9 @@
 package com.stallworks.tako.core.sales.service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import com.stallworks.tako.core.sales.entity.SalesReport;
 import com.stallworks.tako.core.sales.enums.ContainerSize;
 import com.stallworks.tako.core.sales.repository.SalesReportRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,18 +31,30 @@ public class SalesReportServiceImpl implements SalesReportService {
 
 	private final SalesReportMapper salesReportMapper;
 
-	@Override
+	@Transactional
 	public SalesReportResponse create(SalesReportRequest request) {
 
 		List<SalesLineItem> lineItems = request.lineItems().stream().map(this::toLineItem).toList();
 
-		BigDecimal total = lineItems.stream().map(SalesLineItem::getLineTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+		BigDecimal total = lineItems.stream()
+			.map(SalesLineItem::getLineTotal)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+		
+		SalesReport report = salesReportRepository
+		            .findByDateAndBranchId(request.date(), request.branchId())
+		            .orElseGet(SalesReport::new);
 
-		SalesReport report = SalesReport.builder().employeeId(request.employeeId()).branchId(request.branchId())
-				.date(request.date()).timeIn(request.timeIn()).timeOut(request.timeOut()).totalSales(total).build();
+		 report.setEmployeeId(request.employeeId());
+		 report.setBranchId(request.branchId());
+		 report.setDate(request.date());
+		 report.setTimeIn(request.timeIn());
+		 report.setTimeOut(request.timeOut());
+		 report.setTotalSales(total);
+		 
+		 report.getLineItems().clear();
+		 lineItems.forEach(li -> li.setSalesReport(report));
+		 report.getLineItems().addAll(lineItems);
 
-		lineItems.forEach(li -> li.setSalesReport(report));
-		report.setLineItems(lineItems);
 
 		SalesReport saved = salesReportRepository.save(report);
 		return salesReportMapper.toResponse(saved);
@@ -62,8 +77,11 @@ public class SalesReportServiceImpl implements SalesReportService {
 
 		BigDecimal lineTotal = unitPrice.multiply(BigDecimal.valueOf(item.quantitySold()));
 
-		return SalesLineItem.builder().containerSize(item.containerSize()).unitPrice(unitPrice)
-				.quantitySold(item.quantitySold()).lineTotal(lineTotal).build();
+		return SalesLineItem.builder()
+			.containerSize(item.containerSize())
+			.unitPrice(unitPrice)
+			.quantitySold(item.quantitySold())
+			.lineTotal(lineTotal).build();
 
 	}
 	
@@ -75,6 +93,13 @@ public class SalesReportServiceImpl implements SalesReportService {
 				   .toList();
 		   
 	   }
+	   
+	   public Optional<SalesReportResponse> findByDateAndBranch(LocalDate date, Long branchId) {
+	       return salesReportRepository.findByDateAndBranchId(date, branchId)
+	               .map(salesReportMapper::toResponse);
+	   }
+	   
+	   
 	   
 
 }
