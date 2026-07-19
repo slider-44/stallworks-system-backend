@@ -21,34 +21,30 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "branches")
-@NoArgsConstructor      // <-- JPA requires this
+@NoArgsConstructor // <-- JPA requires this
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
 public class Branch {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false, unique = true)
-	private String branchName;
+    @Column(nullable = false, unique = true)
+    private String branchName;
 
-	@Column(nullable = false)
-	@Builder.Default
-	private boolean active = true;
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean active = true;
 
-	@CreationTimestamp
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-	
-
-	
-	
 
 }

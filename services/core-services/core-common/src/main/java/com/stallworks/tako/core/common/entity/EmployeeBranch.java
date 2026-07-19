@@ -23,29 +23,26 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "employee_branches", uniqueConstraints = @UniqueConstraint(name = "uq_employee_branch", columnNames = {
-		"employee_id", "branch_id" }))
+	"employee_id", "branch_id" }))
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
 public class EmployeeBranch {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "employee_id", nullable = false)
-	private Employee employee;
-	
-//	@Column(name = "branch_id", nullable = false)
-//	private Long branchId;
-	
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-	@JoinColumn(name = "branch_id", nullable = false)
-	private Branch branch;
-	
-	@CreationTimestamp
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "employee_id", nullable = false)
+    private Employee employee;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "branch_id", nullable = false)
+    private Branch branch;
+
+    @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 

@@ -32,23 +32,23 @@ import lombok.Setter;
 @Setter
 public class Employee {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false, length = 50)
-	private String firstName;
+    @Column(nullable = false, length = 50)
+    private String firstName;
 
-	@Column(nullable = false, length = 50)
-	private String lastName;
-	
+    @Column(nullable = false, length = 50)
+    private String lastName;
+
     @Column(length = 20)
     private String phoneNumber;
-    
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-    
+
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;
@@ -60,6 +60,5 @@ public class Employee {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
-	
 
 }
