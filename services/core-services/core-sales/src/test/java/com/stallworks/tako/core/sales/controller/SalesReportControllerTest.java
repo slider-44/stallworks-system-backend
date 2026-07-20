@@ -44,8 +44,11 @@ class SalesReportControllerTest {
                 LocalTime.of(8, 0), 
                 LocalTime.of(17, 0),
                 List.of(), 
-                new BigDecimal("245.00"), 
-                null
+                new BigDecimal("245.00"),
+                null,
+                2L,    // createdBy
+                2L   // updatedBy
+               
         );
 
         when(salesReportService.create(any(SalesReportRequest.class))).thenReturn(response);
@@ -78,8 +81,14 @@ class SalesReportControllerTest {
 
     @Test
     void getAll_shouldReturnListOfReports() throws Exception {
-        SalesReportResponse report1 = new SalesReportResponse(1L, 1L, 2L, LocalDate.now(), 
-                LocalTime.of(8,0), LocalTime.of(17,0), List.of(), new BigDecimal("100"), null);
+	 SalesReportResponse report1 = new SalesReportResponse(
+	                1L, 1L, 2L, LocalDate.now(),
+	                LocalTime.of(8, 0), LocalTime.of(17, 0),
+	                List.of(), new BigDecimal("100"),
+	                null,
+	                2L,    // createdBy
+	                2L   // updatedBy
+	        );
 
         when(salesReportService.findAll()).thenReturn(List.of(report1));
 

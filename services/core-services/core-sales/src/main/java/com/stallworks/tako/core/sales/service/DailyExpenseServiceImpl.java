@@ -33,7 +33,7 @@ public class DailyExpenseServiceImpl implements DailyExpenseService {
 	            .toList();
 	    
 	// Save and convert to response
-	    List<DailyExpense> savedEntities = dailyExpenseRepository.saveAll(entities);
+	List<DailyExpense> savedEntities = dailyExpenseRepository.saveAll(entities);
 	    
 	 return savedEntities.stream()
 	           .map(expenseMapper::toResponse)

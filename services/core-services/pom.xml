@@ -40,5 +40,6 @@
 		<module>core-inventory</module>
 		<module>core-app</module>
 		<module>core-common</module>
+		<module>core-attendance</module>
 	</modules>
 </project>

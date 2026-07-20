@@ -54,7 +54,6 @@ public class SalesReport {
 	@Column(nullable = false)
 	private LocalTime timeIn;
 
-	@Column(nullable = false)
 	private LocalTime timeOut;
 
 	@Column(nullable = false)
@@ -64,6 +63,9 @@ public class SalesReport {
 	@OneToMany(mappedBy = "salesReport", cascade = CascadeType.ALL, orphanRemoval = true)
 	@Builder.Default
 	private List<SalesLineItem> lineItems = new ArrayList<>();
+	
+	@Column(name = "created_by", nullable = false)
+	private Long createdBy;
 
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)
@@ -73,4 +75,7 @@ public class SalesReport {
 	@Column(name = "updated_at", nullable = false)
 	private LocalDateTime updatedAt;
 
+	@Column(name = "updated_by", nullable = false)
+	private Long updatedBy;
+	
 }

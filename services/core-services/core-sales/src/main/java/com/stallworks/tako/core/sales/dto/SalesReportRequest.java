@@ -10,9 +10,10 @@ import jakarta.validation.constraints.NotNull;
 
 public record SalesReportRequest(
 	    @NotNull Long employeeId,
+	    @NotNull Long actorEmployeeId, // who is actually submitting/editing right now
 	    @NotNull Long branchId,
 	    @NotNull LocalDate date,
 	    @NotNull LocalTime timeIn,
-	    @NotNull LocalTime timeOut,
-	    @NotEmpty @Valid List<SalesLineItemRequest> lineItems
+	    LocalTime timeOut,
+	    @Valid List<SalesLineItemRequest> lineItems
 	) {}
