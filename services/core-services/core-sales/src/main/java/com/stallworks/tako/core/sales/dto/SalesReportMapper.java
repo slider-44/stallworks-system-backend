@@ -18,17 +18,20 @@ public class SalesReportMapper {
                         li.getLineTotal()))
                 .toList();
 
-        return new SalesReportResponse(
-                report.getId(),
-                report.getBranchId(),
-                report.getEmployeeId(),
-                report.getDate(),
-                report.getTimeIn(),
-                report.getTimeOut(),
-                items,
-                report.getTotalSales(),
-                report.getCreatedAt()
-        );
+	    return new SalesReportResponse(
+	                report.getId(),
+	                report.getBranchId(),
+	                report.getEmployeeId(),
+	                report.getDate(),
+	                report.getTimeIn(),
+	                report.getTimeOut(),
+	                items,
+	                report.getTotalSales(),
+	                report.getCreatedAt(),
+	                report.getCreatedBy(),
+	                report.getUpdatedBy()
+	               
+	        );
 	}
 
 }

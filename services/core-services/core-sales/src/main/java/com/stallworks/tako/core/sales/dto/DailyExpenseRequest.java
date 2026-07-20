@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import jakarta.validation.constraints.NotNull;
 
 public record DailyExpenseRequest(  
-		@NotNull Long branchId,
+	    @NotNull Long branchId,
 	    @NotNull LocalDate date,
 	    @NotNull String description,
 	    BigDecimal amount) {

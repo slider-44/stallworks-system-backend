@@ -44,6 +44,9 @@ public class DailyExpense {
 	@Column(nullable = false)
 	private BigDecimal amount;
 	
+	@Column(nullable = false)
+	private Long createdBy;
+	
 	@CreationTimestamp
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private LocalDateTime createdAt;

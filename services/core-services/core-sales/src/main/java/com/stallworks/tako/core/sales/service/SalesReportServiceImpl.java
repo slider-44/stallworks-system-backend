@@ -43,6 +43,8 @@ public class SalesReportServiceImpl implements SalesReportService {
 		SalesReport report = salesReportRepository
 		            .findByDateAndBranchId(request.date(), request.branchId())
 		            .orElseGet(SalesReport::new);
+		
+		boolean isNew = report.getId() == null;
 
 		 report.setEmployeeId(request.employeeId());
 		 report.setBranchId(request.branchId());
@@ -50,6 +52,12 @@ public class SalesReportServiceImpl implements SalesReportService {
 		 report.setTimeIn(request.timeIn());
 		 report.setTimeOut(request.timeOut());
 		 report.setTotalSales(total);
+		 
+		 if (isNew) {
+		        report.setCreatedBy(request.actorEmployeeId());
+		 }
+		 
+		 report.setUpdatedBy(request.actorEmployeeId());
 		 
 		 report.getLineItems().clear();
 		 lineItems.forEach(li -> li.setSalesReport(report));

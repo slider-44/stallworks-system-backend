@@ -1,3 +1,4 @@
+
 -- Branch table
 CREATE TABLE branches (
     id BIGSERIAL PRIMARY KEY,
@@ -8,7 +9,7 @@ CREATE TABLE branches (
 );
 
 
--- Employee table
+-- Employee table with recommended constraints
 CREATE TABLE employees (
     id BIGSERIAL PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,
@@ -17,7 +18,10 @@ CREATE TABLE employees (
     role VARCHAR(50) NOT NULL,
     active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP
+    updated_at TIMESTAMP,
+    
+    -- Unique constraint on phone_number (recommended)
+    CONSTRAINT uq_employee_phone UNIQUE (phone_number)
 );
 
 
@@ -59,11 +63,13 @@ CREATE TABLE sales_reports (
     branch_id BIGINT NOT NULL,
     date DATE NOT NULL,
     time_in TIME NOT NULL,
-    time_out TIME NOT NULL,
-    total_sales NUMERIC(10,2) NOT NULL,        
+    time_out TIME,
+    total_sales NUMERIC(10,2) NOT NULL,
+    created_by BIGINT,
+    updated_by BIGINT,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    
+
     -- Unique constraint matching your entity
     CONSTRAINT uk_sales_reports_date_branch UNIQUE (date, branch_id)
 );
@@ -88,7 +94,67 @@ CREATE TABLE daily_expenses (
     branch_id BIGINT NOT NULL,
     date DATE NOT NULL,
     description TEXT NOT NULL,                  
-    amount NUMERIC(10,2) NOT NULL,                
+    amount NUMERIC(10,2) NOT NULL,  
+     created_by BIGINT,
+    updated_by BIGINT,              
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE cash_summaries (
+    id BIGSERIAL PRIMARY KEY,
+    date DATE NOT NULL,
+    branch_id BIGINT NOT NULL,
+    petty_cash_yesterday NUMERIC(10,2),
+    gcash NUMERIC(10,2),
+    petty_cash_nextday NUMERIC(10,2),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    CONSTRAINT uk_cash_summaries_date_branch UNIQUE (date, branch_id)
+);
+
+CREATE TABLE bill_count_lines (
+    id BIGSERIAL PRIMARY KEY,
+    cash_summary_id BIGINT NOT NULL,
+    denomination INTEGER NOT NULL,
+    count INTEGER NOT NULL,
+
+    CONSTRAINT fk_bill_count_lines_cash_summary
+        FOREIGN KEY (cash_summary_id) REFERENCES cash_summaries(id) ON DELETE CASCADE
+);
+
+CREATE INDEX idx_bill_count_lines_cash_summary_id ON bill_count_lines(cash_summary_id);
+
+-- =============================================
+-- Attendance Table
+-- =============================================
+
+CREATE TABLE attendance (
+    id BIGSERIAL PRIMARY KEY,
+    
+    employee_id BIGINT NOT NULL,
+    branch_id BIGINT NOT NULL,
+    date DATE NOT NULL,
+    time_in TIME,
+    time_out TIME,
+    updated_by BIGINT,
+    created_by BIGINT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    -- Unique constraint: One attendance record per employee per day
+    CONSTRAINT uk_attendance_employee_date 
+        UNIQUE (employee_id, date),
+
+    -- Foreign key constraints
+    CONSTRAINT fk_attendance_employee
+        FOREIGN KEY (employee_id)
+        REFERENCES employees(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_attendance_branch
+        FOREIGN KEY (branch_id)
+        REFERENCES branches(id)
+        ON DELETE CASCADE
 );

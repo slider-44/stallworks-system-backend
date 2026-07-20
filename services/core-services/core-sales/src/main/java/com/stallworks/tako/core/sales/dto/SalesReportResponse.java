@@ -15,5 +15,7 @@ public record SalesReportResponse (
         LocalTime timeOut,
         List<SalesLineItemResponse> lineItems,
         BigDecimal totalSales,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Long createdBy, 
+        Long updatedBy
 ) {}
