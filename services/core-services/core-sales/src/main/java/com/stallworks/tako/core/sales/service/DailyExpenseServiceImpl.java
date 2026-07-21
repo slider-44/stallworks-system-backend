@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import com.stallworks.tako.core.sales.dto.DailyExpenseRequest;
 import com.stallworks.tako.core.sales.dto.DailyExpenseResponse;
 import com.stallworks.tako.core.sales.dto.ExpenseBatchRequest;
-import com.stallworks.tako.core.sales.dto.ExpenseMapper;
 import com.stallworks.tako.core.sales.entity.DailyExpense;
+import com.stallworks.tako.core.sales.mapper.ExpenseMapper;
 import com.stallworks.tako.core.sales.repository.DailyExpenseRepository;
 
 import lombok.RequiredArgsConstructor;

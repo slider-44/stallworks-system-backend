@@ -21,11 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.stallworks.tako.core.inventory.entity.Containers;
 import com.stallworks.tako.core.inventory.repository.ContainerRepository;
 import com.stallworks.tako.core.sales.dto.SalesLineItemRequest;
-import com.stallworks.tako.core.sales.dto.SalesReportMapper;
 import com.stallworks.tako.core.sales.dto.SalesReportRequest;
 import com.stallworks.tako.core.sales.dto.SalesReportResponse;
 import com.stallworks.tako.core.sales.entity.SalesReport;
 import com.stallworks.tako.core.sales.enums.ContainerSize;
+import com.stallworks.tako.core.sales.mapper.SalesReportMapper;
 import com.stallworks.tako.core.sales.repository.SalesReportRepository;
 
 

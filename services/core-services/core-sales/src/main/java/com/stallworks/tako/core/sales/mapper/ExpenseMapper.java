@@ -1,9 +1,11 @@
-package com.stallworks.tako.core.sales.dto;
+package com.stallworks.tako.core.sales.mapper;
 
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 
+import com.stallworks.tako.core.sales.dto.DailyExpenseRequest;
+import com.stallworks.tako.core.sales.dto.DailyExpenseResponse;
 import com.stallworks.tako.core.sales.entity.DailyExpense;
 
 @Component
