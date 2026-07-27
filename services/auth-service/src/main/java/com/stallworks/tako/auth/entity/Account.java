@@ -30,6 +30,10 @@ public class Account {
     @Column(nullable = false)
     @Builder.Default
     private boolean enabled = true;
+    
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     // Plain reference to an Employee in core-services — NOT a JPA
     // relationship. There's no @ManyToOne/@JoinColumn here because
