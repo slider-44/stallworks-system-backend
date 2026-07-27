@@ -14,6 +14,8 @@ public class AccountMapper {
                 .userName(account.getUserName())
                 .enabled(account.isEnabled())
                 .employeeId(account.getEmployeeId())
+                .role( account.getRole())
+                .createdAt(account.getCreatedAt())
                 .build();
 		
 	}
@@ -25,6 +27,7 @@ public class AccountMapper {
 	                .userName(request.userName())
 	                .password(request.password())
 	                .employeeId(request.employeeId())
+	                .role(request.role())
 	                .enabled(true)
 	                .build();
 		

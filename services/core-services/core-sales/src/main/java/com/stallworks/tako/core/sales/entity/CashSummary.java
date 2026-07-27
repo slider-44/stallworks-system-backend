@@ -13,6 +13,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -71,6 +73,18 @@ public class CashSummary {
 
     private LocalDateTime closedAt;
     private Long closedBy;
-    
+
+    // What Reconciliation showed at the moment this shift was closed —
+    // recorded permanently so admins can review discrepancies later
+    // instead of it only existing transiently in the frontend.
+    @Enumerated(EnumType.STRING)
+    @Column(name = "closing_status", length = 20)
+    private ClosingStatus closingStatus;
+
+    @Column(name = "closing_difference")
+    private BigDecimal closingDifference;
+
+    @Column(name = "closing_note", length = 500)
+    private String closingNote;
 
 }

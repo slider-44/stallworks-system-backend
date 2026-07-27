@@ -3,6 +3,7 @@ package com.stallworks.tako.core.attendance.service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -72,6 +73,18 @@ public class AttendanceServiceImpl implements AttendanceService {
 	 return mapper.toResponse(attendanceRepository.save(a));
 	 
 	
+    }
+
+
+    @Override
+    public List<AttendanceResponse> findOpenToday() {
+	 LocalDate today = LocalDate.now(MANILA);
+	 
+	 return attendanceRepository.findByDateAndTimeOutIsNull(today)
+		 .stream()
+		 .map(mapper::toResponse)
+		 .toList();
+		
     }
 
 //

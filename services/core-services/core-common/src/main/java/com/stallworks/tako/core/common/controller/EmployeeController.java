@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.stallworks.tako.core.common.dto.EmployeeRequest;
 import com.stallworks.tako.core.common.dto.EmployeeResponse;
+import com.stallworks.tako.core.common.service.EmployeeService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EmployeeController {
 	
-	private final com.stallworks.tako.core.common.service.EmployeeService employeeService;
+	private final EmployeeService employeeService;
 	
 	@PostMapping
 	public ResponseEntity<EmployeeResponse> create(@RequestBody @Valid EmployeeRequest request) {
@@ -50,6 +52,13 @@ public class EmployeeController {
 		 
 	 }
 	
+	@GetMapping("/{id}")
+	public ResponseEntity<EmployeeResponse> getById(@PathVariable Long id) {
+	    
+	   return ResponseEntity.ok(employeeService.getById(id));
+	    
+	}
+	 
 
 	
 
