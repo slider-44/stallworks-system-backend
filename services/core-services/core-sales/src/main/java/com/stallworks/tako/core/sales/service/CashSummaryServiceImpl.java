@@ -13,6 +13,7 @@ import com.stallworks.tako.core.sales.dto.CashSummaryRequest;
 import com.stallworks.tako.core.sales.dto.CashSummaryResponse;
 import com.stallworks.tako.core.sales.entity.BillCountLine;
 import com.stallworks.tako.core.sales.entity.CashSummary;
+import com.stallworks.tako.core.sales.entity.ClosingStatus;
 import com.stallworks.tako.core.sales.entity.CloseShiftRequest;
 import com.stallworks.tako.core.sales.mapper.CashSummaryMapper;
 import com.stallworks.tako.core.sales.repository.CashSummaryRepository;
@@ -105,11 +106,20 @@ public class CashSummaryServiceImpl implements CashSummaryService {
     }
     
     public CashSummaryResponse closeShift(CloseShiftRequest request) {
+	    if (request.status() != ClosingStatus.BALANCED
+	            && (request.note() == null || request.note().isBlank())) {
+	        throw new IllegalArgumentException(
+	                "A note explaining the discrepancy is required to close a shift that isn't balanced");
+	    }
+
 	    CashSummary summary = cashSummaryRepository.findByDateAndBranchId(request.date(), request.branchId())
 	            .orElseThrow(() -> new IllegalStateException("Save Cash Count before closing the shift"));
 	    summary.setClosed(true);
 	    summary.setClosedAt(LocalDateTime.now(MANILA));
 	    summary.setClosedBy(request.employeeId());
+	    summary.setClosingStatus(request.status());
+	    summary.setClosingDifference(request.difference());
+	    summary.setClosingNote(request.note());
 	    return toResponseWithTotals(cashSummaryRepository.save(summary));
 	}
 

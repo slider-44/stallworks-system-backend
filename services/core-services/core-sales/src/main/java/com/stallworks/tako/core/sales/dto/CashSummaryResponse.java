@@ -5,7 +5,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record CashSummaryResponse( 
+import com.stallworks.tako.core.sales.entity.ClosingStatus;
+
+public record CashSummaryResponse(
 	    Long id,
 	    LocalDate date,
 	    Long branchId,
@@ -23,10 +25,15 @@ public record CashSummaryResponse(
 	    BigDecimal gcashRemittance,  // same as gcash, kept for symmetry
 	    BigDecimal totalRemittance,  // cashRemittance + gcashRemittance
 	
-	    Boolean closed, 
-	    LocalDateTime closedAt, 
-	    Long closedBy
-	    
+	    Boolean closed,
+	    LocalDateTime closedAt,
+	    Long closedBy,
+
+	    // What Reconciliation showed at the moment of closing — null until
+	    // the shift is actually closed.
+	    ClosingStatus closingStatus,
+	    BigDecimal closingDifference,
+	    String closingNote
 	) {
 
 }

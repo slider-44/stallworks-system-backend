@@ -37,9 +37,12 @@ public class CashSummaryMapper {
 	                cashRemittance, 
 	                summary.getGcash(), 
 	                totalRemittance,
-	                summary.getClosed(),    
-	                summary.getClosedAt(), 
-	                summary.getClosedBy()
+	                summary.getClosed(),
+	                summary.getClosedAt(),
+	                summary.getClosedBy(),
+	                summary.getClosingStatus(),
+	                summary.getClosingDifference(),
+	                summary.getClosingNote()
 	        );
 	
 	

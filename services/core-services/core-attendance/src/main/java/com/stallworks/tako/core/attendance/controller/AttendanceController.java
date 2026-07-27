@@ -1,5 +1,7 @@
 package com.stallworks.tako.core.attendance.controller;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +14,7 @@ import com.stallworks.tako.core.attendance.dto.AttendanceResponse;
 import com.stallworks.tako.core.attendance.dto.ClockInRequest;
 import com.stallworks.tako.core.attendance.service.AttendanceService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -34,9 +37,18 @@ public class AttendanceController {
 
     @PostMapping("/clock-in")
     public ResponseEntity<AttendanceResponse> clockIn(
-	    @RequestBody ClockInRequest request) {
+	    @RequestBody @Valid ClockInRequest request) {
 	
         return ResponseEntity.ok(service.clockIn(request.employeeId(), request.branchId()));
     }
+    
+    @GetMapping("/open")
+    public ResponseEntity<List<AttendanceResponse>> openToday() {
+	
+	return ResponseEntity.ok(service.findOpenToday());
+    
+    
+    }
+    
 
 }

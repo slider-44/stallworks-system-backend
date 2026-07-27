@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.stallworks.tako.core.common.dto.EmployeeMapper;
 import com.stallworks.tako.core.common.dto.EmployeeRequest;
@@ -108,6 +110,20 @@ public class EmployeeServiceImpl implements EmployeeService {
                  ))
                  .toList();
         
+	}
+
+	@Override
+	public EmployeeResponse getById(Long id) {
+	  
+	    Employee emp = employeeRepository.findById(id)
+		    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
+	    
+	    List<Long> branchIds = employeeBranchRepository.findAllByEmployeeIdsWithEmployee(List.of(id)).stream()
+		        .map(eb -> eb.getBranch().getId())
+		        .toList();
+	    
+	    return employeeMapper.toResponse(emp, branchIds);
+
 	}
 
 }

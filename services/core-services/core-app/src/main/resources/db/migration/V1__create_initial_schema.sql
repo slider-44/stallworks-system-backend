@@ -115,6 +115,9 @@ CREATE TABLE cash_summaries (
     closed BOOLEAN NOT NULL DEFAULT FALSE,
     closed_at TIMESTAMP,
     closed_by BIGINT,
+    closing_status VARCHAR(20),
+    closing_difference NUMERIC(10,2),
+    closing_note VARCHAR(500),
 
     CONSTRAINT uk_cash_summaries_date_branch UNIQUE (date, branch_id)
 );
