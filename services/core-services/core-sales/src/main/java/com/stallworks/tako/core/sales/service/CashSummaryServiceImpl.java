@@ -90,10 +90,13 @@ public class CashSummaryServiceImpl implements CashSummaryService {
                 .map(line -> BigDecimal.valueOf(line.getDenomination()).multiply(BigDecimal.valueOf(line.getCount())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal pettyCashNextday = summary.getPettyCashNextday() != null ? summary.getPettyCashNextday() : BigDecimal.ZERO;
         BigDecimal gcash = summary.getGcash() != null ? summary.getGcash() : BigDecimal.ZERO;
 
-        BigDecimal cashRemittance = actualCash.subtract(pettyCashNextday);
+        // Petty cash (starting float) is recorded for the books but no longer
+        // subtracted here — the full counted cash is what gets remitted;
+        // pettyCashNextday is just a record of what the float should be,
+        // not an amount held back from this total.
+        BigDecimal cashRemittance = actualCash;
         BigDecimal totalRemittance = cashRemittance.add(gcash);
 
         return new RemittanceTotals(actualCash, cashRemittance, totalRemittance);
