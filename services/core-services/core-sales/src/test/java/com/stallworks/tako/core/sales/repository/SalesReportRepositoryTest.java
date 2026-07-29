@@ -32,6 +32,8 @@ class SalesReportRepositoryTest {
                 .timeIn(LocalTime.of(8, 0))
                 .timeOut(LocalTime.of(17, 0))
                 .totalSales(new BigDecimal("245.00"))
+                .createdBy(1L)
+                .updatedBy(1L)
                 .build());
 
         Optional<SalesReport> result = repository.findByDateAndBranchId(
