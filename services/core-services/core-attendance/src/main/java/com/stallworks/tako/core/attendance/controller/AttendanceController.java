@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.stallworks.tako.core.attendance.dto.AttendanceResponse;
 import com.stallworks.tako.core.attendance.dto.ClockInRequest;
+import com.stallworks.tako.core.attendance.dto.ClockOutRequest;
 import com.stallworks.tako.core.attendance.service.AttendanceService;
 
 import jakarta.validation.Valid;
@@ -42,6 +43,13 @@ public class AttendanceController {
         return ResponseEntity.ok(service.clockIn(request.employeeId(), request.branchId()));
     }
     
+    @PostMapping("/clock-out")
+    public ResponseEntity<AttendanceResponse> clockOut(
+	    @RequestBody @Valid ClockOutRequest request) {
+
+        return ResponseEntity.ok(service.clockOut(request.employeeId()));
+    }
+
     @GetMapping("/open")
     public ResponseEntity<List<AttendanceResponse>> openToday() {
 	
