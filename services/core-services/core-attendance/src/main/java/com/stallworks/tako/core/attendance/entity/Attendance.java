@@ -43,6 +43,9 @@ public class Attendance {
     @Column(nullable = false) 
     private LocalDate date;
     
+    @Column(name = "edit_reason", length = 500)
+    private String editReason;   // why an admin corrected this record — shown to the employee
+    
     private LocalTime timeIn;   // nullable until clocked in
     private LocalTime timeOut; 
     
