@@ -57,10 +57,10 @@ public class SalesReportServiceImpl implements SalesReportService {
 		 report.setTotalSales(total);
 		 
 		 if (isNew) {
-		        report.setCreatedBy(request.actorEmployeeId());
+		        report.setCreatedBy(request.updatedBy());
 		 }
 		 
-		 report.setUpdatedBy(request.actorEmployeeId());
+		 report.setUpdatedBy(request.updatedBy());
 		 
 		 report.getLineItems().clear();
 		 lineItems.forEach(li -> li.setSalesReport(report));
@@ -75,7 +75,7 @@ public class SalesReportServiceImpl implements SalesReportService {
 			    request.date(),
 			    request.timeIn(),
 			    request.timeOut(),
-			    request.actorEmployeeId()
+			    request.updatedBy()
 		);
 
 		
