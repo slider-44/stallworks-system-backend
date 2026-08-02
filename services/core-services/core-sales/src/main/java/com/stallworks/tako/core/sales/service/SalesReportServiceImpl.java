@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.stallworks.tako.core.attendance.service.AttendanceService;
 import com.stallworks.tako.core.inventory.entity.Containers;
 import com.stallworks.tako.core.inventory.repository.ContainerRepository;
 import com.stallworks.tako.core.sales.dto.SalesLineItemRequest;
@@ -30,6 +31,8 @@ public class SalesReportServiceImpl implements SalesReportService {
 	private final ContainerRepository containerRepository;
 
 	private final SalesReportMapper salesReportMapper;
+	
+	private final AttendanceService attendanceService;
 
 	@Transactional
 	public SalesReportResponse create(SalesReportRequest request) {
@@ -65,6 +68,18 @@ public class SalesReportServiceImpl implements SalesReportService {
 
 
 		SalesReport saved = salesReportRepository.save(report);
+		
+		attendanceService.ensureRecordExists(
+			    request.employeeId(),
+			    request.branchId(),
+			    request.date(),
+			    request.timeIn(),
+			    request.timeOut(),
+			    request.actorEmployeeId()
+		);
+
+		
+		
 		return salesReportMapper.toResponse(saved);
 
 	}

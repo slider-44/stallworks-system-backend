@@ -9,7 +9,8 @@ public record AttendanceResponse(
         Long branchId,
         LocalDate date,
         LocalTime timeIn,
-        LocalTime timeOut
+        LocalTime timeOut,
+        String editReason
 ) {
-    // You can add static factory methods or custom constructors here if needed
+   
 }
