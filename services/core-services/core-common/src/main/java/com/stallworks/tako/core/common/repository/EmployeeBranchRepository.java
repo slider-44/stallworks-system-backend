@@ -30,5 +30,8 @@ public interface EmployeeBranchRepository extends JpaRepository<EmployeeBranch, 
 	            WHERE eb.employee.id IN :employeeIds
 	            """)
 	    List<EmployeeBranch> findAllByEmployeeIdsWithEmployee(List<Long> employeeIds);
+	  
+	  
+	  void deleteAllByEmployeeId(Long employeeId);
 
 }

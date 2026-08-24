@@ -125,5 +125,12 @@ public class CashSummaryServiceImpl implements CashSummaryService {
 	    summary.setClosingNote(request.note());
 	    return toResponseWithTotals(cashSummaryRepository.save(summary));
 	}
+    
+    
+    @Override
+    public Optional<CashSummaryResponse> findPreviousForBranch(LocalDate date, Long branchId) {
+        return cashSummaryRepository.findFirstByBranchIdAndDateLessThanOrderByDateDesc(branchId, date)
+                .map(this::toResponseWithTotals);
+    }
 
 }

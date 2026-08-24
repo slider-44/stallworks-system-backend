@@ -14,5 +14,7 @@ public interface CashSummaryService {
     Optional<CashSummaryResponse> findByDateAndBranch(LocalDate date, Long branchId);
     
     CashSummaryResponse closeShift(CloseShiftRequest request);
+    
+    Optional<CashSummaryResponse> findPreviousForBranch(LocalDate date, Long branchId);
 
 }

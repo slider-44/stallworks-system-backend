@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,10 +46,10 @@ public class EmployeeController {
 	}
 	
 	@GetMapping
-	 public ResponseEntity<List<EmployeeResponse>> getAll() {
-		
-		 List<EmployeeResponse> employees = employeeService.getAll();
-		 return ResponseEntity.ok(employees);
+	 public ResponseEntity<List<EmployeeResponse>> getAll() {	
+	
+	    	List<EmployeeResponse> employees = employeeService.getAll();
+		return ResponseEntity.ok(employees);
 		 
 	 }
 	
@@ -56,6 +57,15 @@ public class EmployeeController {
 	public ResponseEntity<EmployeeResponse> getById(@PathVariable Long id) {
 	    
 	   return ResponseEntity.ok(employeeService.getById(id));
+	    
+	}
+	
+
+	@PutMapping("/{id}")
+	public ResponseEntity<EmployeeResponse> update(@PathVariable Long id, 
+		@RequestBody @Valid EmployeeRequest employeeRequest) {
+	    
+	    return ResponseEntity.ok(employeeService.update(id, employeeRequest));
 	    
 	}
 	 

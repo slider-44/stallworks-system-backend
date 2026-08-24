@@ -54,5 +54,19 @@ public class CashSummaryController {
         return ResponseEntity.ok(cashSummaryService.closeShift(request));
     }
     
+    public ResponseEntity<CashSummaryResponse> getPreviousSummary(
+	    @RequestParam LocalDate date, 
+	    @RequestParam Long branchId
+	    ) {
+	
+	return cashSummaryService.findByDateAndBranch(date, branchId)
+		.map(ResponseEntity::ok)
+		.orElse(ResponseEntity.notFound().build());
+
+	
+    }
+    
+    
+    
 
 }
