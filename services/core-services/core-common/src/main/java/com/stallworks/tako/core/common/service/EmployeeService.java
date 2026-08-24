@@ -13,5 +13,7 @@ public interface EmployeeService {
 	public List<EmployeeResponse> getAll();
 	
 	public EmployeeResponse getById(Long id);
+	
+	public EmployeeResponse update(Long id, EmployeeRequest request);
 
 }

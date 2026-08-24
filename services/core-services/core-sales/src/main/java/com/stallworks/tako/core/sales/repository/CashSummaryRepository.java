@@ -10,4 +10,6 @@ import com.stallworks.tako.core.sales.entity.CashSummary;
 public interface CashSummaryRepository extends JpaRepository <CashSummary, Long> {
     
     Optional<CashSummary> findByDateAndBranchId(LocalDate date, Long branchId);
+    
+    Optional<CashSummary> findFirstByBranchIdAndDateLessThanOrderByDateDesc(Long branchId, LocalDate date);
 }
