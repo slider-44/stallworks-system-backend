@@ -31,7 +31,8 @@ public class AttendanceMapper {
 		attendance.getBranchId(),
 		attendance.getDate(),
 		attendance.getTimeIn(),
-		attendance.getTimeOut()
+		attendance.getTimeOut(),
+		attendance.getEditReason()
 		);
     }
 

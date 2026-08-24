@@ -21,11 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.stallworks.tako.core.inventory.entity.Containers;
 import com.stallworks.tako.core.inventory.repository.ContainerRepository;
 import com.stallworks.tako.core.sales.dto.SalesLineItemRequest;
-import com.stallworks.tako.core.sales.dto.SalesReportMapper;
 import com.stallworks.tako.core.sales.dto.SalesReportRequest;
 import com.stallworks.tako.core.sales.dto.SalesReportResponse;
 import com.stallworks.tako.core.sales.entity.SalesReport;
 import com.stallworks.tako.core.sales.enums.ContainerSize;
+import com.stallworks.tako.core.sales.mapper.SalesReportMapper;
 import com.stallworks.tako.core.sales.repository.SalesReportRepository;
 
 
@@ -87,10 +87,10 @@ public class SalesReportServiceImplTest {
 	
 	@Test
 	void create_rejectsAddOns_whenNoManualPriceGiven() {
-		
+
 	    SalesReportRequest request = new SalesReportRequest(
 	            1L, 1L, 2L, LocalDate.of(2026, 7, 12), LocalTime.of(8, 0), LocalTime.of(17, 0),
-	            List.of(new SalesLineItemRequest(ContainerSize.ADD_ONS, 2, new BigDecimal("30.00")))
+	            List.of(new SalesLineItemRequest(ContainerSize.ADD_ONS, 2, null))
 	    );
 		  assertThatThrownBy(() -> service.create(request))
           .isInstanceOf(IllegalArgumentException.class)

@@ -1,11 +1,8 @@
 package com.stallworks.tako.core.attendance.entity;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -45,6 +42,9 @@ public class Attendance {
     
     @Column(nullable = false) 
     private LocalDate date;
+    
+    @Column(name = "edit_reason", length = 500)
+    private String editReason;   // why an admin corrected this record — shown to the employee
     
     private LocalTime timeIn;   // nullable until clocked in
     private LocalTime timeOut; 

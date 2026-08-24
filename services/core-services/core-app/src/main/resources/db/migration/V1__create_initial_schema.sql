@@ -108,8 +108,16 @@ CREATE TABLE cash_summaries (
     petty_cash_yesterday NUMERIC(10,2),
     gcash NUMERIC(10,2),
     petty_cash_nextday NUMERIC(10,2),
+    updated_by BIGINT,
+    created_by BIGINT,  
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    closed BOOLEAN NOT NULL DEFAULT FALSE,
+    closed_at TIMESTAMP,
+    closed_by BIGINT,
+    closing_status VARCHAR(20),
+    closing_difference NUMERIC(10,2),
+    closing_note VARCHAR(500),
 
     CONSTRAINT uk_cash_summaries_date_branch UNIQUE (date, branch_id)
 );

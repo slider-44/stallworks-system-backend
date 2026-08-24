@@ -67,12 +67,13 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://auth-db:5432/${AUTH_DB_NAME}
       SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
       SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      CORE_SERVICE_URL: http://core-service:8080
     ports:
       - "${AUTH_SERVICE_PORT}:8080"
 
   core-service:
     build:
-      context: ./services/core-service
+      context: ./services/core-services
     profiles: ["apps"]
     restart: unless-stopped
     depends_on:
@@ -87,20 +88,21 @@ services:
       - "${CORE_SERVICE_PORT}:8080"
 
   # ---------- gateway ----------
-  # api-gateway:
-  #   build:
-  #     context: ./gateway/api-gateway
-  #   profiles: ["apps"]
-  #   restart: unless-stopped
-  #   depends_on:
-  #     - auth-service
-  #     - core-service
-  #   environment:
-  #     SERVER_PORT: 8080
-  #     AUTH_URI: http://auth-service:8080
-  #     CORE_URI: http://core-service:8080
-  #   ports:
-  #     - "8090:8080"
+  api-gateway:
+    build:
+      context: ./gateway/api-gateway
+    profiles: ["apps"]
+    restart: unless-stopped
+    depends_on:
+      - auth-service
+      - core-service
+    environment:
+      SERVER_PORT: 8080
+      AUTH_URI: http://auth-service:8080
+      CORE_URI: http://core-service:8080
+      ALLOWED_ORIGINS: http://localhost:5173
+    ports:
+      - "8090:8080"
 
 volumes:
   auth_db_data:

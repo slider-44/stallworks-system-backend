@@ -1,8 +1,11 @@
 package com.stallworks.tako.auth.controller;
 
 import java.net.URI;
+import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +28,7 @@ public class UserController {
 	
 	
 	@PostMapping
+	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<AccountResponse> create(@RequestBody @Valid AccountRequest userRequest) {
 		
 		AccountResponse response = userService.createUser(userRequest);
@@ -37,6 +41,13 @@ public class UserController {
 		
 		return ResponseEntity.created(location).body(response);
 		
+	}
+	
+	@GetMapping
+	public ResponseEntity<List<AccountResponse>> getUsers() {
+	    
+	    return ResponseEntity.ok(userService.getUsers());
+	    
 	}
 	
 	

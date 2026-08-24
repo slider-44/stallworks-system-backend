@@ -11,5 +11,9 @@ public interface EmployeeService {
 	public EmployeeResponse create(EmployeeRequest request);
 	
 	public List<EmployeeResponse> getAll();
+	
+	public EmployeeResponse getById(Long id);
+	
+	public EmployeeResponse update(Long id, EmployeeRequest request);
 
 }

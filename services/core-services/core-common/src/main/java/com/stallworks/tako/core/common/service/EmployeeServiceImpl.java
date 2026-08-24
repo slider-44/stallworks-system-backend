@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.stallworks.tako.core.common.dto.EmployeeMapper;
 import com.stallworks.tako.core.common.dto.EmployeeRequest;
@@ -50,18 +52,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 		        .toList();
 
 		
-//		List<EmployeeBranch> branchesToSave = request.branchIds().stream()
-//				.map(branchId -> EmployeeBranch.builder()
-//						.employee(savedEmp)
-//						.branchId(branchId)
-//						.build())
-//				.toList();
+
 		
 		employeeBranchRepository.saveAll(branchesToSave);
 		
-//		return employeeMapper.toResponse(savedEmp, branchesToSave.stream()
-//				.map(EmployeeBranch::getBranchId).toList());
-		
+	
 		return employeeMapper.toResponse(
 		        savedEmp,
 		        branchesToSave.stream()
@@ -83,12 +78,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 		 
 		 List<EmployeeBranch> employeeBranches = employeeBranchRepository.findAllByEmployeeIdsWithEmployee(employeeIds);
 		 
-		// Group branch ids by employee id, e.g. { 1 -> [1,2], 2 -> [3] }
-//         Map<Long, List<Long>> branchIdsByEmployeeId = employeeBranches.stream()
-//                .collect(Collectors.groupingBy(
-//                        eb -> eb.getEmployee().getId(),
-//                        Collectors.mapping(EmployeeBranch::getBranchId, Collectors.toList())
-//                ));
          
 		 
 		 Map<Long, List<Long>> branchIdsByEmployeeId = employeeBranches.stream()
@@ -108,6 +97,56 @@ public class EmployeeServiceImpl implements EmployeeService {
                  ))
                  .toList();
         
+	}
+
+	@Override
+	public EmployeeResponse getById(Long id) {
+	  
+	    Employee emp = employeeRepository.findById(id)
+		    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
+	    
+	    List<Long> branchIds = employeeBranchRepository.findAllByEmployeeIdsWithEmployee(List.of(id)).stream()
+		        .map(eb -> eb.getBranch().getId())
+		        .toList();
+	    
+	    return employeeMapper.toResponse(emp, branchIds);
+
+	}
+
+	@Override
+	public EmployeeResponse update(Long id, EmployeeRequest request) {
+	    
+	    Employee employee = employeeRepository.findById(id)
+		        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Employee not found"));
+	    
+	    employee.setFirstName(request.firstName());
+	    employee.setLastName(request.lastName());
+	    employee.setPhoneNumber(request.phoneNumber());
+	    employee.setRole(request.role());
+	    employee.setHourlyRate(request.hourlyRate());
+	    
+	    Employee saved = employeeRepository.save(employee);
+	    
+	    employeeBranchRepository.deleteAllByEmployeeId(id);
+	    
+	    List<EmployeeBranch> branchesToSave = request.branchIds().stream()
+	            .map(branchId -> EmployeeBranch.builder()
+	                    .employee(saved)
+	                    .branch(branchRepository.getReferenceById(branchId))
+	                    .build())
+	            .toList();
+	    
+	    employeeBranchRepository.saveAll(branchesToSave);
+
+	    return employeeMapper.toResponse(
+	            saved,
+	            branchesToSave.stream()
+	            .map(EmployeeBranch::getBranch)
+	            .map(Branch::getId)
+	            .toList()
+	    );
+
+
 	}
 
 }

@@ -15,6 +15,7 @@ public class EmployeeMapper {
 		.lastName(request.lastName())
 		.phoneNumber(request.phoneNumber())
 		.role(request.role())
+		.hourlyRate(request.hourlyRate())
 	.build();
     }
 
@@ -26,7 +27,8 @@ public class EmployeeMapper {
 		employee.getPhoneNumber(),
 		employee.getRole(),
 		employee.isActive(),
-		branchIds);
+		branchIds,
+		employee.getHourlyRate());
     }
 
 }

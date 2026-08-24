@@ -57,6 +57,7 @@ class SalesReportControllerTest {
                 {
                     "branchId": 1,
                     "employeeId": 2,
+                    "actorEmployeeId": 2,
                     "date": "2026-07-12",
                     "timeIn": "08:00",
                     "timeOut": "17:00",
@@ -70,7 +71,7 @@ class SalesReportControllerTest {
                 """;
 
         // When & Then
-        mockMvc.perform(post("/v1/sales-reports")
+        mockMvc.perform(post("/api/v1/sales-reports")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestJson))
                 .andExpect(status().isOk())           // Note: you're using .ok(), not .created()
@@ -92,7 +93,7 @@ class SalesReportControllerTest {
 
         when(salesReportService.findAll()).thenReturn(List.of(report1));
 
-        mockMvc.perform(get("/v1/sales-reports"))
+        mockMvc.perform(get("/api/v1/sales-reports"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(1));
