@@ -10,5 +10,9 @@ import com.stallworks.tako.core.sales.entity.DailyExpense;
 public interface DailyExpenseRepository extends JpaRepository<DailyExpense, Long> {
 	
 	List<DailyExpense> findByDateAndBranchId(LocalDate date, Long branchId);
+	
+	List<DailyExpense> findByDateBetween(LocalDate from, LocalDate to);
+	
+	List<DailyExpense> findByDateBetweenAndBranchId(LocalDate from, LocalDate to, Long branchId);
 
 }

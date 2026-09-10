@@ -42,5 +42,6 @@
 		<module>core-common</module>
 		<module>core-attendance</module>
 		<module>core-payroll</module>
+		<module>core-reports</module>
 	</modules>
 </project>
