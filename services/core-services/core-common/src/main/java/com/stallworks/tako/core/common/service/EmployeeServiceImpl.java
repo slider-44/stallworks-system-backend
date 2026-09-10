@@ -38,8 +38,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public EmployeeResponse create(EmployeeRequest request) {
 		
 		// 1. Check if employee already exists
-		if(employeeRepository.existsByPhoneNumber(request.phoneNumber())) {
-			 throw new RuntimeException("Employee already exists");
+	       if (request.phoneNumber() != null && !request.phoneNumber().isBlank()
+		        && employeeRepository.existsByPhoneNumber(request.phoneNumber())) {
+		     throw new RuntimeException("Employee already exists");
 		}
 		
 		Employee savedEmp =  employeeRepository.save(employeeMapper.toEntity(request));

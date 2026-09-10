@@ -3,7 +3,9 @@ package com.stallworks.tako.core.sales.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.stallworks.tako.core.sales.dto.BillCountLineRequest;
 import com.stallworks.tako.core.sales.dto.CashSummaryRequest;
 import com.stallworks.tako.core.sales.dto.CashSummaryResponse;
+import com.stallworks.tako.core.sales.dto.RemittanceMonthlyTotals;
 import com.stallworks.tako.core.sales.entity.BillCountLine;
 import com.stallworks.tako.core.sales.entity.CashSummary;
 import com.stallworks.tako.core.sales.entity.ClosingStatus;
@@ -92,11 +95,11 @@ public class CashSummaryServiceImpl implements CashSummaryService {
 
         BigDecimal gcash = summary.getGcash() != null ? summary.getGcash() : BigDecimal.ZERO;
 
-        // Petty cash (starting float) is recorded for the books but no longer
-        // subtracted here — the full counted cash is what gets remitted;
-        // pettyCashNextday is just a record of what the float should be,
-        // not an amount held back from this total.
-        BigDecimal cashRemittance = actualCash;
+        BigDecimal pettyCashNextday = summary.getPettyCashNextday() != null
+                ? summary.getPettyCashNextday() : BigDecimal.ZERO;
+        BigDecimal cashRemittance = actualCash.subtract(pettyCashNextday);
+       
+        
         BigDecimal totalRemittance = cashRemittance.add(gcash);
 
         return new RemittanceTotals(actualCash, cashRemittance, totalRemittance);
@@ -131,6 +134,30 @@ public class CashSummaryServiceImpl implements CashSummaryService {
     public Optional<CashSummaryResponse> findPreviousForBranch(LocalDate date, Long branchId) {
         return cashSummaryRepository.findFirstByBranchIdAndDateLessThanOrderByDateDesc(branchId, date)
                 .map(this::toResponseWithTotals);
+    }
+
+    @Override
+    public RemittanceMonthlyTotals sumRemittanceForMonth(YearMonth month, Long branchId ) {
+	
+	LocalDate from = month.atDay(1);
+	LocalDate to = month.atEndOfMonth();
+	
+	List<CashSummary> records  = branchId != null
+		    ? cashSummaryRepository.findByDateBetweenAndBranchId(from, to, branchId)
+		    : cashSummaryRepository.findByDateBetween(from, to);
+	
+	BigDecimal cashRemitted = BigDecimal.ZERO;
+	BigDecimal gcashRemitted = BigDecimal.ZERO;
+	
+	 for (CashSummary summary : records) {
+	     RemittanceTotals totals = calculateRemittanceTotals(summary);
+	     cashRemitted = cashRemitted.add(totals.cashRemittance());
+	     gcashRemitted = gcashRemitted.add(summary.getGcash() != null ? summary.getGcash() : BigDecimal.ZERO);
+	     
+	 }
+	
+
+	 return new RemittanceMonthlyTotals(cashRemitted, gcashRemitted, cashRemitted.add(gcashRemitted));
     }
 
 }
