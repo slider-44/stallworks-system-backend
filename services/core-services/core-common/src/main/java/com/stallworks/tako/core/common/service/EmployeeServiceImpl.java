@@ -115,6 +115,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
+	@Transactional
 	public EmployeeResponse update(Long id, EmployeeRequest request) {
 	    
 	    Employee employee = employeeRepository.findById(id)
