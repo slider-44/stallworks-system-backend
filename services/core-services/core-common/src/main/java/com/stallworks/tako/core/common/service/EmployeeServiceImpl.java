@@ -130,6 +130,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	    Employee saved = employeeRepository.save(employee);
 	    
 	    employeeBranchRepository.deleteAllByEmployeeId(id);
+	    employeeBranchRepository.flush();
 	    
 	    List<EmployeeBranch> branchesToSave = request.branchIds().stream()
 	            .map(branchId -> EmployeeBranch.builder()
