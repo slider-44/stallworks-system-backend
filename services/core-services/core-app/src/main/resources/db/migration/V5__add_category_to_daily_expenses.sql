@@ -1,0 +1,1 @@
+ALTER TABLE daily_expenses ADD COLUMN category VARCHAR(10) NOT NULL DEFAULT 'COGS';

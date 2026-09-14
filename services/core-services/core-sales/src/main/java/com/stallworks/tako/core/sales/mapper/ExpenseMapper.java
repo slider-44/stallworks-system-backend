@@ -18,6 +18,7 @@ public class ExpenseMapper {
                     .branchId(expense.branchId())
                     .description(expense.description())
                     .amount(expense.amount())
+                    .category(expense.category())
                     .build();
 				
 		
@@ -28,7 +29,8 @@ public class ExpenseMapper {
 	                entity.getBranchId(),
 	                entity.getDate(),
 	                entity.getDescription(),
-	                entity.getAmount()
+	                entity.getAmount(),
+	                entity.getCategory()
 	        );
 	    }
 	 
