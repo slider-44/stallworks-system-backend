@@ -3,11 +3,14 @@ package com.stallworks.tako.core.sales.dto;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import com.stallworks.tako.core.sales.enums.ExpenseCategory;
+
 public record DailyExpenseResponse(	
-		Long branchId,
+	    Long branchId,
 	    LocalDate date,
 	    String description,
-	    BigDecimal amount) {
+	    BigDecimal amount,
+	    ExpenseCategory category) {
 
 }
 

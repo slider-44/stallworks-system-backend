@@ -28,6 +28,7 @@ import com.stallworks.tako.core.reports.dto.MonthlySummaryResponse;
 import com.stallworks.tako.core.sales.dto.RemittanceMonthlyTotals;
 import com.stallworks.tako.core.sales.entity.DailyExpense;
 import com.stallworks.tako.core.sales.entity.SalesReport;
+import com.stallworks.tako.core.sales.enums.ExpenseCategory;
 import com.stallworks.tako.core.sales.repository.DailyExpenseRepository;
 import com.stallworks.tako.core.sales.repository.SalesReportRepository;
 import com.stallworks.tako.core.sales.service.CashSummaryService;
@@ -74,24 +75,32 @@ public class MonthlyReportServiceImpl implements MonthlyReportService {
 		 : dailyExpenseRepository.findByDateBetween(from, to);
 	
 	
-	BigDecimal totalExpenses = expenses.stream()
+	BigDecimal cogsExpenses = expenses.stream()
+		.filter(e -> e.getCategory() == ExpenseCategory.COGS)
 		.map(DailyExpense::getAmount)
 		.reduce(BigDecimal.ZERO, BigDecimal::add);
 	
+	 BigDecimal overheadExpenses = expenses.stream()
+			.filter(e -> e.getCategory() == ExpenseCategory.OVERHEAD)
+			.map(DailyExpense::getAmount)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
 	
-	BigDecimal totalPurchaseOrders = purchaseOrderService.sumForMonth(month, branchId);
-	
-	BigDecimal totalPayroll = payrollService.calculateMonthly(month, branchId).stream()
-		.map(PayrollMonthlySummaryResponse:: totalEarned)
-		.reduce(BigDecimal.ZERO, BigDecimal::add);
-	
-	RemittanceMonthlyTotals remittance = cashSummaryService.sumRemittanceForMonth(month, branchId);
+	 BigDecimal totalPurchaseOrders = purchaseOrderService.sumForMonth(month, branchId);
 
-	BigDecimal netProfit = totalSales
-		.subtract(totalPurchaseOrders)
-		.subtract(totalExpenses)
-	        .subtract(totalPayroll)
-	        .setScale(2, RoundingMode.HALF_UP);
+	
+	 BigDecimal totalPayroll = payrollService.calculateMonthly(month, branchId).stream()
+			.map(PayrollMonthlySummaryResponse:: totalEarned)
+			.reduce(BigDecimal.ZERO, BigDecimal::add);
+	
+	 RemittanceMonthlyTotals remittance = cashSummaryService.sumRemittanceForMonth(month, branchId);
+
+	 BigDecimal costOfGoods = totalPurchaseOrders.add(cogsExpenses);
+
+	  BigDecimal netProfit = totalSales
+			.subtract(costOfGoods)
+			.subtract(overheadExpenses)
+		        .subtract(totalPayroll)
+		        .setScale(2, RoundingMode.HALF_UP);
 	
 	
 	 String branchName = branchId != null
@@ -100,18 +109,19 @@ public class MonthlyReportServiceImpl implements MonthlyReportService {
 	
 	
 	 return new MonthlySummaryResponse(
-	                month.toString(),
-	                branchId,
-	                branchName,
-	                totalSales.setScale(2, RoundingMode.HALF_UP),
-	                totalPurchaseOrders.setScale(2, RoundingMode.HALF_UP),
-	                totalExpenses.setScale(2, RoundingMode.HALF_UP),
-	                totalPayroll.setScale(2, RoundingMode.HALF_UP),
-	                netProfit,
-	                remittance.cashRemitted().setScale(2, RoundingMode.HALF_UP),
-	                remittance.gcashRemitted().setScale(2, RoundingMode.HALF_UP),
-	                remittance.totalRemitted().setScale(2, RoundingMode.HALF_UP));
-	
+                 month.toString(),
+                 branchId,
+                 branchName,
+                 totalSales.setScale(2, RoundingMode.HALF_UP),
+                 totalPurchaseOrders.setScale(2, RoundingMode.HALF_UP),
+                 cogsExpenses.setScale(2, RoundingMode.HALF_UP),
+                 costOfGoods.setScale(2, RoundingMode.HALF_UP),
+                 overheadExpenses.setScale(2, RoundingMode.HALF_UP),
+                 totalPayroll.setScale(2, RoundingMode.HALF_UP),
+                 netProfit,
+                 remittance.cashRemitted().setScale(2, RoundingMode.HALF_UP),
+                 remittance.gcashRemitted().setScale(2, RoundingMode.HALF_UP),
+                 remittance.totalRemitted().setScale(2, RoundingMode.HALF_UP));
 	   
 	   
     }

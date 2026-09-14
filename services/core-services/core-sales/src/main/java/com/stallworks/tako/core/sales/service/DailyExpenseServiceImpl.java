@@ -3,7 +3,9 @@ package com.stallworks.tako.core.sales.service;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.stallworks.tako.core.sales.dto.DailyExpenseRequest;
 import com.stallworks.tako.core.sales.dto.DailyExpenseResponse;
@@ -54,4 +56,29 @@ public class DailyExpenseServiceImpl implements DailyExpenseService {
 	
 	return null;
     }
+
+    @Override
+    public DailyExpenseResponse update(Long id, DailyExpenseRequest request) {
+	DailyExpense expense = dailyExpenseRepository.findById(id)
+		.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Expense not found"));
+
+	expense.setBranchId(request.branchId());
+	expense.setDate(request.date());
+	expense.setDescription(request.description());
+	expense.setAmount(request.amount());
+	expense.setCategory(request.category());
+
+	return expenseMapper.toResponse(dailyExpenseRepository.save(expense));
+    }
+
+
+    @Override
+    public void delete(Long id) {
+	if (!dailyExpenseRepository.existsById(id)) {
+	    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Expense not found");
+	}
+	dailyExpenseRepository.deleteById(id);
+    }
+	
+    
 }
