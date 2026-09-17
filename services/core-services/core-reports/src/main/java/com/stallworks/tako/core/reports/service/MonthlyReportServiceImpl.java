@@ -32,6 +32,7 @@ import com.stallworks.tako.core.sales.enums.ExpenseCategory;
 import com.stallworks.tako.core.sales.repository.DailyExpenseRepository;
 import com.stallworks.tako.core.sales.repository.SalesReportRepository;
 import com.stallworks.tako.core.sales.service.CashSummaryService;
+import com.stallworks.tako.core.sales.service.OverheadExpenseService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -54,6 +55,8 @@ public class MonthlyReportServiceImpl implements MonthlyReportService {
     private final AttendanceRepository attendanceRepository;
     
     private final EmployeeRepository employeeRepository;
+    
+    private final OverheadExpenseService overheadExpenseService;
 
     @Override
     public MonthlySummaryResponse monthlySummary(YearMonth month, Long branchId) {
@@ -80,11 +83,16 @@ public class MonthlyReportServiceImpl implements MonthlyReportService {
 		.map(DailyExpense::getAmount)
 		.reduce(BigDecimal.ZERO, BigDecimal::add);
 	
-	 BigDecimal overheadExpenses = expenses.stream()
-			.filter(e -> e.getCategory() == ExpenseCategory.OVERHEAD)
-			.map(DailyExpense::getAmount)
-			.reduce(BigDecimal.ZERO, BigDecimal::add);
+	BigDecimal overheadExpensesFromShifts = expenses.stream()
+		.filter(e -> e.getCategory() == ExpenseCategory.OVERHEAD)
+		.map(DailyExpense::getAmount)
+		.reduce(BigDecimal.ZERO, BigDecimal::add);
 	
+	 BigDecimal overheadExpensesStandalone = overheadExpenseService.sumForMonth(month, branchId);
+
+	 BigDecimal overheadExpenses = overheadExpensesFromShifts.add(overheadExpensesStandalone);
+	
+
 	 BigDecimal totalPurchaseOrders = purchaseOrderService.sumForMonth(month, branchId);
 
 	
