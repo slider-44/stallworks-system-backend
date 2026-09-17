@@ -38,8 +38,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 	public EmployeeResponse create(EmployeeRequest request) {
 		
 		// 1. Check if employee already exists
-		if(employeeRepository.existsByPhoneNumber(request.phoneNumber())) {
-			 throw new RuntimeException("Employee already exists");
+	       if (request.phoneNumber() != null && !request.phoneNumber().isBlank()
+		        && employeeRepository.existsByPhoneNumber(request.phoneNumber())) {
+		     throw new RuntimeException("Employee already exists");
 		}
 		
 		Employee savedEmp =  employeeRepository.save(employeeMapper.toEntity(request));
@@ -114,6 +115,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	}
 
 	@Override
+	@Transactional
 	public EmployeeResponse update(Long id, EmployeeRequest request) {
 	    
 	    Employee employee = employeeRepository.findById(id)
@@ -128,6 +130,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 	    Employee saved = employeeRepository.save(employee);
 	    
 	    employeeBranchRepository.deleteAllByEmployeeId(id);
+	    employeeBranchRepository.flush();
 	    
 	    List<EmployeeBranch> branchesToSave = request.branchIds().stream()
 	            .map(branchId -> EmployeeBranch.builder()
