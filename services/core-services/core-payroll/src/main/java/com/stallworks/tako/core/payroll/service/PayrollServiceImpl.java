@@ -25,6 +25,8 @@ import com.stallworks.tako.core.payroll.dto.PayrollDailyEntryResponse;
 import com.stallworks.tako.core.payroll.dto.PayrollDailyResponse;
 import com.stallworks.tako.core.payroll.dto.PayrollMonthlyDetailResponse;
 import com.stallworks.tako.core.payroll.dto.PayrollMonthlySummaryResponse;
+import com.stallworks.tako.core.sales.entity.SalaryAdvance;
+import com.stallworks.tako.core.sales.repository.SalaryAdvanceRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +40,8 @@ public class PayrollServiceImpl implements PayrollService {
     private final EmployeeRepository employeeRepository;
     
     private final BranchRepository branchRepository;
+    
+    private final SalaryAdvanceRepository salaryAdvanceRepository;
     
     @Override
     public PayrollDailyResponse calculateDaily(Long employeeId, LocalDate date) {
@@ -57,6 +61,7 @@ public class PayrollServiceImpl implements PayrollService {
         );
     }
     
+
     @Override
     public List<PayrollMonthlySummaryResponse> calculateMonthly(YearMonth month, Long branchId) {
         LocalDate from = month.atDay(1);
@@ -69,47 +74,58 @@ public class PayrollServiceImpl implements PayrollService {
         Map<Long, List<Attendance>> byEmployee = records.stream()
                 .collect(Collectors.groupingBy(Attendance::getEmployeeId));
 
+        List<SalaryAdvance> advanceRecords = branchId != null
+                ? salaryAdvanceRepository.findByDateBetweenAndBranchId(from, to, branchId)
+                : salaryAdvanceRepository.findByDateBetween(from, to);
+
+        Map<Long, BigDecimal> advancesByEmployee = advanceRecords.stream()
+                .collect(Collectors.groupingBy(SalaryAdvance::getEmployeeId,
+                        Collectors.reducing(BigDecimal.ZERO, SalaryAdvance::getAmount, BigDecimal::add)));
+
         return byEmployee.entrySet().stream()
-                .map(entry -> summarize(entry.getKey(), entry.getValue()))
+                .map(entry -> summarize(entry.getKey(), entry.getValue(),
+                        advancesByEmployee.getOrDefault(entry.getKey(), BigDecimal.ZERO)))
                 .filter(Objects::nonNull) // no hourly rate set yet — skip rather than 500
                 .sorted(Comparator.comparing(PayrollMonthlySummaryResponse::employeeName))
                 .toList();
     }
     
-    private PayrollMonthlySummaryResponse summarize(Long employeeId, List<Attendance> records) {
-        Employee employee = employeeRepository.findById(employeeId).orElse(null);
-        if (employee == null || employee.getHourlyRate() == null) {
-            return null;
-        }
+    private PayrollMonthlySummaryResponse summarize(Long employeeId, List<Attendance> records, BigDecimal totalAdvances) {
+	    Employee employee = employeeRepository.findById(employeeId).orElse(null);
+	    if (employee == null || employee.getHourlyRate() == null) {
+	        return null;
+	    }
 
-        int daysWorked = records.size();
-        BigDecimal totalHours = records.stream()
-                .map(a -> hoursWorked(a.getTimeIn(), a.getTimeOut()))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal totalEarned = totalHours.multiply(employee.getHourlyRate()).setScale(2, RoundingMode.HALF_UP);
+	    int daysWorked = records.size();
+	    BigDecimal totalHours = records.stream()
+	            .map(a -> hoursWorked(a.getTimeIn(), a.getTimeOut()))
+	            .reduce(BigDecimal.ZERO, BigDecimal::add);
+	    BigDecimal totalEarned = totalHours.multiply(employee.getHourlyRate()).setScale(2, RoundingMode.HALF_UP);
 
-        // Branch shown per row = most recent record's branch. Under a branch
-        // filter every record already shares that branch anyway; under "All
-        // Branches" this is just a representative pick for display.
-        Long branchId = records.stream()
-                .max(Comparator.comparing(Attendance::getDate))
-                .map(Attendance::getBranchId)
-                .orElse(null);
-        String branchName = branchId != null
-                ? branchRepository.findById(branchId).map(Branch::getBranchName).orElse("—")
-                : "—";
+	    Long branchId = records.stream()
+	            .max(Comparator.comparing(Attendance::getDate))
+	            .map(Attendance::getBranchId)
+	            .orElse(null);
+	    String branchName = branchId != null
+	            ? branchRepository.findById(branchId).map(Branch::getBranchName).orElse("—")
+	            : "—";
 
-        return new PayrollMonthlySummaryResponse(
-                employeeId,
-                employee.getFirstName() + " " + employee.getLastName(),
-                branchId,
-                branchName,
-                employee.getHourlyRate(),
-                daysWorked,
-                totalHours.setScale(2, RoundingMode.HALF_UP),
-                totalEarned
-        );
-    }
+	    BigDecimal advances = totalAdvances.setScale(2, RoundingMode.HALF_UP);
+	    BigDecimal netPay = totalEarned.subtract(advances).setScale(2, RoundingMode.HALF_UP);
+
+	    return new PayrollMonthlySummaryResponse(
+	            employeeId,
+	            employee.getFirstName() + " " + employee.getLastName(),
+	            branchId,
+	            branchName,
+	            employee.getHourlyRate(),
+	            daysWorked,
+	            totalHours.setScale(2, RoundingMode.HALF_UP),
+	            totalEarned,
+	            advances,
+	            netPay
+	    );
+	}
     
     @Override
     public PayrollMonthlyDetailResponse monthlyDetail(Long employeeId, YearMonth month) {
@@ -136,6 +152,13 @@ public class PayrollServiceImpl implements PayrollService {
                 .map(PayrollDailyEntryResponse::earned)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        BigDecimal totalAdvances = salaryAdvanceRepository.findByEmployeeIdAndDateBetween(employeeId, from, to).stream()
+                .map(SalaryAdvance::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, RoundingMode.HALF_UP);
+
+        BigDecimal netPay = totalEarned.subtract(totalAdvances).setScale(2, RoundingMode.HALF_UP);
+
         Long branchId = records.stream()
                 .max(Comparator.comparing(Attendance::getDate))
                 .map(Attendance::getBranchId)
@@ -151,10 +174,11 @@ public class PayrollServiceImpl implements PayrollService {
                 branchName,
                 employee.getHourlyRate(),
                 days,
-                totalEarned
+                totalEarned,
+                totalAdvances,
+                netPay
         );
     }
-    
     private Employee requireEmployeeWithRate(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,

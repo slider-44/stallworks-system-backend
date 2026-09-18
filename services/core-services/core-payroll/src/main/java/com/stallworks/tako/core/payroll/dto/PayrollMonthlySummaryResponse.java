@@ -10,5 +10,7 @@ public record PayrollMonthlySummaryResponse(
 	    BigDecimal hourlyRate,
 	    int daysWorked,
 	    BigDecimal totalHours,
-	    BigDecimal totalEarned
+	    BigDecimal totalEarned,
+	    BigDecimal totalAdvances,
+	    BigDecimal netPay
 	) {}
