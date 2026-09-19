@@ -10,5 +10,7 @@ public record PayrollMonthlyDetailResponse(
 	    String branchName,
 	    BigDecimal hourlyRate,
 	    List<PayrollDailyEntryResponse> days,
-	    BigDecimal totalEarned
+	    BigDecimal totalEarned,
+	    BigDecimal totalAdvances,
+	    BigDecimal netPay
 	) {}
