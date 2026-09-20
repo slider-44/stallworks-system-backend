@@ -22,88 +22,72 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class AttendanceServiceImpl implements AttendanceService {
-    
+
     private final AttendanceRepository attendanceRepository;
-    
+
     private final AttendanceMapper mapper;
-    
+
     private static final ZoneId MANILA = ZoneId.of("Asia/Manila");
 
     @Override
     public AttendanceResponse clockIn(Long employeeId, Long branchId) {
-	
+
 	LocalDate today = LocalDate.now(MANILA);
-	
-	if(attendanceRepository.findByEmployeeIdAndDate(employeeId, today).isPresent()) {
+
+	if (attendanceRepository.findByEmployeeIdAndDate(employeeId, today).isPresent()) {
 	    throw new IllegalStateException("Already clocked in today");
 	}
-	
-	Attendance attendance = Attendance.builder()
-	            .employeeId(employeeId)
-	            .branchId(branchId).date(today)
-	            .timeIn(LocalTime.now())
-	            .build();
-	
-	 Attendance saved = attendanceRepository.save(attendance);
-	 
+
+	Attendance attendance = Attendance.builder().employeeId(employeeId).branchId(branchId).date(today).timeIn(
+		LocalTime.now()).build();
+
+	Attendance saved = attendanceRepository.save(attendance);
+
 	return mapper.toResponse(saved);
-	
-	
+
     }
 
-
-    
     @Override
     public Optional<AttendanceResponse> findToday(Long employeeId) {
-	
-	return attendanceRepository.findByEmployeeIdAndDate(employeeId, LocalDate.now(MANILA))
-		.map(mapper:: toResponse);
-    }
 
+	return attendanceRepository.findByEmployeeIdAndDate(employeeId, LocalDate.now(MANILA)).map(mapper::toResponse);
+    }
 
     @Override
     public AttendanceResponse clockOut(Long employeeId) {
-	 Attendance a = attendanceRepository.findByEmployeeIdAndDate(employeeId, LocalDate.now(MANILA))
-		 .orElseThrow(() -> new IllegalStateException("Not clocked in yet"));
-	 
-	 if (a.getTimeOut() != null) throw new IllegalStateException("Already clocked out today");
-	 a.setTimeOut(LocalTime.now(MANILA));
-	 return mapper.toResponse(attendanceRepository.save(a));
-	 
-	
-    }
+	Attendance a = attendanceRepository.findByEmployeeIdAndDate(employeeId, LocalDate.now(MANILA)).orElseThrow(
+		() -> new IllegalStateException("Not clocked in yet"));
 
+	if (a.getTimeOut() != null)
+	    throw new IllegalStateException("Already clocked out today");
+	a.setTimeOut(LocalTime.now(MANILA));
+	return mapper.toResponse(attendanceRepository.save(a));
+
+    }
 
     @Override
     public List<AttendanceResponse> findOpenToday() {
-	 LocalDate today = LocalDate.now(MANILA);
+	LocalDate today = LocalDate.now(MANILA);
 
-	 return attendanceRepository.findByDateAndTimeOutIsNull(today)
-		 .stream()
-		 .map(mapper::toResponse)
-		 .toList();
+	return attendanceRepository.findByDateAndTimeOutIsNull(today).stream().map(mapper::toResponse).toList();
 
     }
 
     @Override
     public List<AttendanceResponse> findHistory(Long employeeId, LocalDate from, LocalDate to) {
-	return attendanceRepository.findByEmployeeIdAndDateBetweenOrderByDateDesc(employeeId, from, to)
-		.stream()
-		.map(mapper::toResponse)
-		.toList();
+	return attendanceRepository.findByEmployeeIdAndDateBetweenOrderByDateDesc(employeeId, from, to).stream().map(
+		mapper::toResponse).toList();
     }
-
 
     @Override
     public void delete(Long id) {
 	if (!attendanceRepository.existsById(id)) {
 	    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance record not found");
 	}
-	
-	attendanceRepository.deleteById(id);
-	
-    }
 
+	attendanceRepository.deleteById(id);
+
+    }
 
     @Override
     public List<AttendanceResponse> findByFilters(LocalDate date, Long branchId, Long employeeId) {
@@ -118,56 +102,68 @@ public class AttendanceServiceImpl implements AttendanceService {
 	} else {
 	    results = attendanceRepository.findByDate(date);
 	}
-	
-	return results.stream()
-		.map(mapper::toResponse)
-		.toList();
+
+	return results.stream().map(mapper::toResponse).toList();
     }
-
-
 
     @Override
     public AttendanceResponse update(Long id, AttendanceUpdateRequest request, Long updatedBy) {
-	
-	Attendance a = attendanceRepository.findById(id)
-		.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Attendance record not found"));
-	
+
+	Attendance a = attendanceRepository.findById(id).orElseThrow(() -> new ResponseStatusException(
+		HttpStatus.NOT_FOUND,
+		"Attendance record not found"));
+
 	a.setTimeIn(request.timeIn());
 	a.setTimeOut(request.timeOut());
 	a.setEditReason(request.reason());
 	a.setUpdatedBy(request.updatedBy());
 
 	return mapper.toResponse(attendanceRepository.save(a));
-		
+
     }
 
     @Override
     public void ensureRecordExists(Long employeeId, Long branchId, LocalDate date, LocalTime timeIn, LocalTime timeOut,
 	    Long updatedBy) {
-	
-	if(attendanceRepository.findByEmployeeIdAndDate(employeeId, date).isPresent()) {
+
+	Optional<Attendance> existing = attendanceRepository.findByEmployeeIdAndDate(employeeId, date);
+
+	if (existing.isPresent()) {
+	    Attendance attendance = existing.get();
+	    boolean isBackfilled = attendance.getEditReason() != null && attendance.getEditReason().startsWith(
+		    "Backfilled from Daily Closing Report");
+
+	    // Only touch a record that was itself created as a backfill from this
+	    // same flow — a REAL clock-in (from Time Clock) is left alone here;
+	    // correcting one of those requires Time Records (Admin), which
+	    // enforces a reason for audit purposes. Otherwise, editing Time
+	    // In/Out on the Sales tab for someone with a genuine clock-in would
+	    // silently rewrite their real attendance with no trail of why.
+	    if (isBackfilled && (!java.util.Objects.equals(attendance.getTimeIn(), timeIn) || !java.util.Objects.equals(
+		    attendance.getTimeOut(), timeOut))) {
+		attendance.setTimeIn(timeIn);
+		attendance.setTimeOut(timeOut);
+		attendance.setUpdatedBy(updatedBy);
+		attendanceRepository.save(attendance);
+	    }
+	    
+	    
 	    return;
 	}
 	
-	 Attendance attendance = Attendance.builder()
-	            .employeeId(employeeId)
-	            .branchId(branchId)
-	            .date(date)
-	            .timeIn(timeIn)
-	            .timeOut(timeOut)
-	            .updatedBy(updatedBy)
-	            .editReason("Backfilled from Daily Closing Report — no clock-in on record for this date.")
-	            .build();
+	  Attendance attendance = Attendance.builder()
+	                .employeeId(employeeId)
+	                .branchId(branchId)
+	                .date(date)
+	                .timeIn(timeIn)
+	                .timeOut(timeOut)
+	                .updatedBy(updatedBy)
+	                .editReason("Backfilled from Daily Closing Report — no clock-in on record for this date.")
+	                .build();
 
-	    attendanceRepository.save(attendance);
-	
-	
-	
+		attendanceRepository.save(attendance);
+
+
     }
-
-
-    
-    
-
 
 }
